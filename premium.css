@@ -1,0 +1,91 @@
+/* ============================================================
+   premium.css — Extra polish layer
+   Import AFTER style.css in all pages
+   ============================================================ */
+
+/* Page header section */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.page-header-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.3px;
+}
+
+.page-header-sub {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+  font-weight: 400;
+}
+
+/* Row spacing */
+.row-gap { margin-bottom: 24px; }
+
+/* Glass divider */
+.glass-divider {
+  border: none;
+  height: 1px;
+  background: var(--glass-border);
+  margin: 20px 0;
+}
+
+/* Glow line top accent for cards */
+.card-accent-blue  { border-top: 2px solid var(--primary); }
+.card-accent-green { border-top: 2px solid var(--success); }
+.card-accent-cyan  { border-top: 2px solid var(--secondary); }
+.card-accent-amber { border-top: 2px solid var(--warning); }
+.card-accent-red   { border-top: 2px solid var(--danger); }
+
+/* Inline tag chips */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 50px;
+  font-size: 11px;
+  font-weight: 600;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  color: var(--text-secondary);
+}
+
+/* Premium select & input override for dark selects */
+select.form-select {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%2394A3B8' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+}
+
+/* Mobile table scrollable */
+.table-responsive {
+  border-radius: var(--radius-lg);
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Floating action glow on hover for stat row */
+.stats-row .stat-card:hover {
+  box-shadow: var(--shadow-md), var(--shadow-glow);
+}
+
+/* Value number color highlights */
+.val-blue  { color: var(--primary-light); font-weight: 700; }
+.val-green { color: #34D399; font-weight: 700; }
+.val-amber { color: #FCD34D; font-weight: 700; }
+.val-red   { color: #F87171; font-weight: 700; }
+.val-cyan  { color: #22D3EE; font-weight: 700; }
+
+/* Mobile touch-friendly button row */
+@media (max-width: 576px) {
+  .btn { padding: 8px 14px; font-size: 13px; }
+  .table-toolbar { gap: 8px; }
+  .page-header { flex-direction: column; align-items: flex-start; }
+}
+
