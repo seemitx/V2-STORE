@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>เข้าสู่ระบบ - IMS Stocker</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Kanit', 'Segoe UI', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: #020817;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Animated background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 20% 0%,   rgba(59,130,246,0.22) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 80% 100%, rgba(139,92,246,0.18) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 40% at 50% 50%,  rgba(6,182,212,0.1)   0%, transparent 70%),
+        linear-gradient(135deg, #020817 0%, #0A1628 50%, #0D1F38 100%);
+      z-index: 0;
+    }
+
+    /* Floating orbs */
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      animation: floatOrb 8s ease-in-out infinite;
+      pointer-events: none;
+    }
+    .orb-1 { width: 400px; height: 400px; background: rgba(59,130,246,0.12); top: -100px; left: -100px; animation-delay: 0s; }
+    .orb-2 { width: 300px; height: 300px; background: rgba(139,92,246,0.1);  bottom: -80px; right: -80px; animation-delay: 3s; }
+    .orb-3 { width: 200px; height: 200px; background: rgba(6,182,212,0.08);  top: 50%; left: 60%; animation-delay: 6s; }
+
+    @keyframes floatOrb {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(20px, -30px) scale(1.05); }
+      66% { transform: translate(-15px, 15px) scale(0.95); }
+    }
+
+    .login-wrap {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 420px;
+      animation: loginFadeIn 0.6s cubic-bezier(0.4,0,0.2,1) forwards;
+    }
+
+    @keyframes loginFadeIn {
+      from { opacity: 0; transform: translateY(30px) scale(0.97); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .login-card {
+      background: rgba(15, 30, 53, 0.75);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(59,130,246,0.08) inset;
+    }
+
+    .login-header {
+      padding: 36px 36px 28px;
+      text-align: center;
+      position: relative;
+    }
+
+    /* Subtle top gradient accent */
+    .login-header::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--p, #3B82F6), var(--s, #06B6D4));
+    }
+
+    .login-logo {
+      width: 72px; height: 72px;
+      background: linear-gradient(135deg, #3B82F6, #06B6D4);
+      border-radius: 20px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      margin-bottom: 16px;
+      box-shadow: 0 8px 32px rgba(59,130,246,0.4), 0 0 0 1px rgba(255,255,255,0.1) inset;
+      animation: logoPulse 3s ease-in-out infinite;
+    }
+
+    @keyframes logoPulse {
+      0%, 100% { box-shadow: 0 8px 32px rgba(59,130,246,0.4), 0 0 0 1px rgba(255,255,255,0.1) inset; }
+      50% { box-shadow: 0 8px 48px rgba(59,130,246,0.6), 0 0 0 1px rgba(255,255,255,0.15) inset; }
+    }
+
+    .login-header h1 {
+      font-size: 24px;
+      font-weight: 800;
+      color: #F1F5F9;
+      margin: 0 0 4px;
+      letter-spacing: -0.3px;
+    }
+
+    .login-header p {
+      font-size: 13px;
+      color: rgba(148,163,184,0.8);
+      margin: 0;
+      font-weight: 400;
+    }
+
+    .login-body {
+      padding: 28px 36px 36px;
+    }
+
+    .demo-info {
+      background: rgba(59,130,246,0.08);
+      border: 1px solid rgba(59,130,246,0.2);
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-size: 12px;
+      color: #93C5FD;
+      margin-bottom: 24px;
+    }
+
+    .demo-info strong {
+      display: block;
+      margin-bottom: 4px;
+      font-weight: 600;
+      font-size: 12px;
+    }
+
+    .form-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #94A3B8;
+      margin-bottom: 7px;
+      display: block;
+    }
+
+    .form-control {
+      width: 100%;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 11px 44px 11px 14px;
+      font-size: 14px;
+      font-family: 'Kanit', sans-serif;
+      color: #F1F5F9;
+      transition: all 0.2s;
+    }
+
+    .form-control::placeholder { color: rgba(148,163,184,0.5); }
+
+    .form-control:focus {
+      outline: none;
+      border-color: rgba(59,130,246,0.5);
+      background: rgba(59,130,246,0.08);
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+    }
+
+    .input-icon-wrap { position: relative; }
+
+    .input-icon {
+      position: absolute; right: 13px; top: 50%;
+      transform: translateY(-50%);
+      color: #475569;
+      cursor: pointer;
+      font-size: 16px;
+      transition: color 0.2s;
+      user-select: none;
+    }
+
+    .input-icon:hover { color: #94A3B8; }
+
+    .mb-4 { margin-bottom: 20px; }
+
+    .btn-login {
+      width: 100%;
+      background: linear-gradient(135deg, #3B82F6, #06B6D4);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 13px;
+      font-size: 15px;
+      font-weight: 700;
+      font-family: 'Kanit', sans-serif;
+      letter-spacing: 0.3px;
+      cursor: pointer;
+      transition: all 0.25s;
+      box-shadow: 0 6px 20px rgba(59,130,246,0.35);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-login::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(255,255,255,0.1);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .btn-login:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(59,130,246,0.5);
+    }
+
+    .btn-login:hover::after { opacity: 1; }
+    .btn-login:active { transform: translateY(0); }
+
+    .btn-login:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .error-msg {
+      background: rgba(239,68,68,0.1);
+      border: 1px solid rgba(239,68,68,0.25);
+      border-radius: 10px;
+      padding: 11px 14px;
+      font-size: 13px;
+      color: #FCA5A5;
+      margin-bottom: 18px;
+      display: none;
+      animation: loginFadeIn 0.3s ease;
+    }
+
+    .copyright {
+      text-align: center;
+      font-size: 12px;
+      color: rgba(148,163,184,0.35);
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <div class="login-wrap">
+    <div class="login-card">
+      <div class="login-header">
+        <div class="login-logo">📦</div>
+        <h1>IMS Stocker</h1>
+        <p>ระบบจัดการสต๊อกสินค้า</p>
+      </div>
+
+      <div class="login-body">
+        <div class="demo-info">
+          <strong>🔑 บัญชีทดสอบ</strong>
+          Admin: admin / admin1234 &nbsp;|&nbsp; Staff: staff / staff1234
+        </div>
+
+        <div class="error-msg" id="errorMsg">❌ ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง</div>
+
+        <div class="mb-4">
+          <label class="form-label">ชื่อผู้ใช้</label>
+          <input type="text" class="form-control" id="username" placeholder="กรอกชื่อผู้ใช้" autocomplete="username">
+        </div>
+
+        <div class="mb-4">
+          <label class="form-label">รหัสผ่าน</label>
+          <div class="input-icon-wrap">
+            <input type="password" class="form-control" id="password" placeholder="กรอกรหัสผ่าน" autocomplete="current-password">
+            <span class="input-icon" onclick="togglePassword()" id="eyeIcon">👁️</span>
+          </div>
+        </div>
+
+        <button class="btn-login" id="loginBtn" onclick="doLogin()">
+          <span id="loginText">เข้าสู่ระบบ</span>
+        </button>
+      </div>
+    </div>
+
+    <p class="copyright">© 2024 Inventory Management System</p>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.10.5/sweetalert2.all.min.js"></script>
+  <script>
+    // ถ้า login อยู่แล้ว ไปหน้า dashboard
+    if (getSession()) window.location.href = 'index.html';
+
+    let showingPw = false;
+    function togglePassword() {
+      showingPw = !showingPw;
+      const inp = document.getElementById('password');
+      inp.type = showingPw ? 'text' : 'password';
+      document.getElementById('eyeIcon').textContent = showingPw ? '🙈' : '👁️';
+    }
+
+    document.getElementById('password').addEventListener('keydown', e => {
+      if (e.key === 'Enter') doLogin();
+    });
+
+    async function doLogin() {
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+      const errEl = document.getElementById('errorMsg');
+      const btn = document.getElementById('loginBtn');
+      const txt = document.getElementById('loginText');
+
+      if (!username || !password) {
+        errEl.textContent = '⚠️ กรุณากรอกชื่อผู้ใช้และรหัสผ่าน';
+        errEl.style.display = 'block';
+        return;
+      }
+
+      btn.disabled = true;
+      txt.textContent = 'กำลังตรวจสอบ...';
+      errEl.style.display = 'none';
+
+      // Demo mode - no API needed
+      if ((username === 'admin' && password === 'admin1234') ||
+          (username === 'staff' && password === 'staff1234')) {
+        setSession({ username, role: username === 'admin' ? 'admin' : 'staff', id: username });
+        window.location.href = 'index.html';
+        return;
+      }
+
+      // Real API login
+      const result = await apiLogin(username, password);
+      if (result.success) {
+        setSession(result.user);
+        window.location.href = 'index.html';
+      } else {
+        errEl.textContent = '❌ ' + (result.message || 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง');
+        errEl.style.display = 'block';
+        btn.disabled = false;
+        txt.textContent = 'เข้าสู่ระบบ';
+      }
+    }
+
+    // Override showLoader/hideLoader for login page (no loader element)
+    function showLoader() {}
+    function hideLoader() {}
+  </script>
+</body>
+</html>
