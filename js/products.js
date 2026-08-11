@@ -310,6 +310,20 @@ async function saveProduct() {
     showToast(result.message || 'บันทึกสำเร็จ', 'success');
     productModal.hide();
     loadProducts();
+
+    if (editMode) {
+      notifyProductUpdate({ productName: data.productName, sku: data.sku });
+    } else {
+      notifyProductAdd({
+        productName: data.productName,
+        sku: data.sku,
+        category: data.category,
+        unit: data.unit,
+        quantity: data.quantity,
+        costPrice: data.costPrice,
+        sellPrice: data.sellPrice,
+      });
+    }
   } else {
     showToast(result.message || 'เกิดข้อผิดพลาด', 'error');
   }
@@ -322,6 +336,7 @@ async function deleteProduct(id, name) {
   if (result.success) {
     showToast(result.message, 'success');
     loadProducts();
+    notifyProductDelete({ productName: name, id });
   } else {
     showToast(result.message, 'error');
   }
