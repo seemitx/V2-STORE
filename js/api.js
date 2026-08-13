@@ -8,6 +8,21 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbzm2oYJvn7qmm9wejmW0xno
 // ============================================================
 // Core Fetch Functions
 // ============================================================
+// Reads a fetch Response as text first, then tries to JSON-parse it.
+// If Apps Script isn't deployed correctly (wrong URL, access set to
+// something other than "Anyone", or a login/HTML error page returned
+// instead of JSON) fetch() succeeds but the body isn't JSON. Without
+// this check that shows up as a generic, hard-to-diagnose failure.
+async function parseApiResponse(res) {
+  const text = await res.text();
+  try {
+    return JSON.parse(text);
+  } catch (_) {
+    console.error('API ตอบกลับไม่เป็น JSON (ตรวจสอบการ Deploy ของ Google Apps Script):', text.slice(0, 300));
+    throw new Error('เซิร์ฟเวอร์ตอบกลับไม่ถูกต้อง (ไม่ใช่ JSON) — ตรวจสอบว่า Deploy Apps Script ล่าสุดแล้ว และตั้งค่า Who has access เป็น Anyone');
+  }
+}
+
 async function apiGet(action, params = {}) {
   const url = new URL(API_URL);
   url.searchParams.set('action', action);
@@ -16,12 +31,11 @@ async function apiGet(action, params = {}) {
   showLoader();
   try {
     const res = await fetch(url.toString());
-    const data = await res.json();
-    return data;
+    return await parseApiResponse(res);
   } catch (err) {
     console.error('API GET error:', err);
-    showToast('เกิดข้อผิดพลาดในการเชื่อมต่อ', 'error');
-    return { success: false, message: err.toString() };
+    showToast(err.message || 'เกิดข้อผิดพลาดในการเชื่อมต่อ', 'error');
+    return { success: false, message: err.message || err.toString() };
   } finally {
     hideLoader();
   }
@@ -35,12 +49,11 @@ async function apiPost(action, body = {}) {
       body: JSON.stringify({ action, ...body }),
       headers: { 'Content-Type': 'text/plain' }  // ใช้ text/plain เพื่อหลีกเลี่ยง CORS preflight
     });
-    const data = await res.json();
-    return data;
+    return await parseApiResponse(res);
   } catch (err) {
     console.error('API POST error:', err);
-    showToast('เกิดข้อผิดพลาดในการเชื่อมต่อ', 'error');
-    return { success: false, message: err.toString() };
+    showToast(err.message || 'เกิดข้อผิดพลาดในการเชื่อมต่อ', 'error');
+    return { success: false, message: err.message || err.toString() };
   } finally {
     hideLoader();
   }
@@ -238,11 +251,13 @@ function renderPagination(containerId, currentPage, totalPages, callback) {
 // Format Helpers
 // ============================================================
 function formatNumber(n) {
-  return new Intl.NumberFormat('th-TH').format(n || 0);
+  const v = Number(n);
+  return new Intl.NumberFormat('th-TH').format(Number.isFinite(v) ? v : 0);
 }
 
 function formatCurrency(n) {
-  return new Intl.NumberFormat('th-TH', { style: 'currency', currency: 'THB', minimumFractionDigits: 0 }).format(n || 0);
+  const v = Number(n);
+  return new Intl.NumberFormat('th-TH', { style: 'currency', currency: 'THB', minimumFractionDigits: 0 }).format(Number.isFinite(v) ? v : 0);
 }
 
 function formatDate(d) {
