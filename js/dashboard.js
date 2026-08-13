@@ -13,18 +13,52 @@ async function loadDashboard() {
   const container = document.getElementById('pageContent');
   container.innerHTML = getSkeletonHTML();
 
-  const result = await apiGetDashboard();
-
-  if (!result.success) {
-    container.innerHTML = renderError(result.message);
+  let result;
+  try {
+    result = await apiGetDashboard();
+  } catch (err) {
+    console.error('Dashboard load exception:', err);
+    container.innerHTML = renderError('เกิดข้อผิดพลาดที่ไม่คาดคิด: ' + err.message);
     return;
   }
 
-  const d = result.data;
-  container.innerHTML = getDashboardHTML(d);
-  renderMovementChart(d.chart);
-  renderCategoryBars(d.categories);
-  renderLowStockList(d.lowStockItems);
+  if (!result || !result.success) {
+    console.error('Dashboard API returned failure:', result);
+    container.innerHTML = renderError(result && result.message);
+    return;
+  }
+  if (!result.data) {
+    console.error('Dashboard API succeeded but returned no data:', result);
+    container.innerHTML = renderError('เชื่อมต่อสำเร็จ แต่ไม่ได้รับข้อมูลจาก Google Sheet (data ว่าง)');
+    return;
+  }
+
+  // Guard against missing/NaN fields so one bad row in the sheet
+  // (e.g. a blank price cell) can't blank out the whole dashboard.
+  const raw = result.data;
+  const d = {
+    totalProducts: Number(raw.totalProducts) || 0,
+    outOfStock: Number(raw.outOfStock) || 0,
+    lowStock: Number(raw.lowStock) || 0,
+    totalValue: Number(raw.totalValue) || 0,
+    chart: {
+      labels: (raw.chart && raw.chart.labels) || [],
+      in: (raw.chart && raw.chart.in) || [],
+      out: (raw.chart && raw.chart.out) || [],
+    },
+    categories: raw.categories || {},
+    lowStockItems: raw.lowStockItems || [],
+  };
+
+  try {
+    container.innerHTML = getDashboardHTML(d);
+    renderMovementChart(d.chart);
+    renderCategoryBars(d.categories);
+    renderLowStockList(d.lowStockItems);
+  } catch (err) {
+    console.error('Dashboard render exception:', err);
+    container.innerHTML = renderError('แสดงผล Dashboard ไม่สำเร็จ: ' + err.message);
+  }
 }
 
 function getDashboardHTML(d) {
@@ -312,8 +346,13 @@ function getSkeletonHTML() {
 }
 
 function renderError(msg) {
-  return `<div style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.25);border-radius:14px;padding:20px 24px;margin:8px 0;color:#F87171;display:flex;align-items:center;gap:12px;">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-    ${msg||'เกิดข้อผิดพลาด'}
+  return `<div style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.25);border-radius:14px;padding:20px 24px;margin:8px 0;color:#F87171;display:flex;align-items:flex-start;gap:12px;">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:2px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    <div style="flex:1;">
+      <div style="font-weight:600;margin-bottom:4px;">โหลด Dashboard ไม่สำเร็จ</div>
+      <div style="font-size:13px;opacity:0.9;word-break:break-word;">${msg || 'เกิดข้อผิดพลาดไม่ทราบสาเหตุ — เปิด Console (F12) เพื่อดูรายละเอียด'}</div>
+      <div style="font-size:12px;opacity:0.7;margin-top:6px;">ตรวจสอบว่า API_URL ใน js/api.js ตรงกับ URL ที่ Deploy ล่าสุดจาก Google Apps Script (Deploy &gt; Manage deployments) และตั้งค่า "Who has access: Anyone"</div>
+      <button class="btn btn-sm btn-outline-primary" style="margin-top:10px;" onclick="loadDashboard()">ลองใหม่</button>
+    </div>
   </div>`;
 }
