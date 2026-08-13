@@ -188,17 +188,7 @@ async function submitStockIn() {
     if (pRes.success) { siAllProducts = pRes.data; populateProductSelect(); }
     if (hRes.success) { siHistory = hRes.data; renderHistory(); }
 
-    const updated = pRes.success ? pRes.data.find(x => x.ProductID === productID) : null;
-    notifyStockIn({
-      productName: p?.ProductName,
-      sku: p?.SKU,
-      quantity,
-      unit: p?.Unit,
-      supplier,
-      date,
-      note,
-      newQuantity: updated ? updated.Quantity : (p ? parseInt(p.Quantity) + quantity : null),
-    });
+    // Notification for this stock-in is sent server-side by Code.gs.
   } else {
     showToast(result.message || 'เกิดข้อผิดพลาด', 'error');
   }
