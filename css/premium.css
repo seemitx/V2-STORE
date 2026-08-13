@@ -59,9 +59,19 @@
   color: var(--text-secondary);
 }
 
-/* Premium select & input override for dark selects */
+/* Premium select & input override for dark selects
+   NOTE: background-image alone (no repeat/position/size) made this arrow
+   TILE across the whole select, producing the "many chevrons" glitch.
+   Fixed below with explicit repeat/position/size + native arrow removed. */
 select.form-select {
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%2394A3B8' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 0.85rem center;
+  background-size: 13px 10px;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  padding-right: 2.6rem !important;
 }
 
 /* Mobile table scrollable */
@@ -88,4 +98,19 @@ select.form-select {
   .table-toolbar { gap: 8px; }
   .page-header { flex-direction: column; align-items: flex-start; }
 }
+
+/* ============================================================
+   Light-mode contrast fixes
+   The badge/text colors below were tuned for dark backgrounds
+   only (bright pastel text on near-black). On the light theme
+   background they read washed-out and low-contrast, which is
+   part of why the light theme has looked "buggy". Darken them
+   only when light mode is active; dark mode keeps the original
+   bright palette untouched.
+   ============================================================ */
+body:not(.dark-mode) .bg-success   { color: #047857 !important; background: rgba(16,185,129,0.12) !important; border-color: rgba(16,185,129,0.35); }
+body:not(.dark-mode) .bg-warning   { color: #B45309 !important; background: rgba(245,158,11,0.14) !important; border-color: rgba(245,158,11,0.35); }
+body:not(.dark-mode) .bg-danger    { color: #B91C1C !important; background: rgba(239,68,68,0.12)  !important; border-color: rgba(239,68,68,0.35); }
+body:not(.dark-mode) .bg-primary   { color: #1D4ED8 !important; background: rgba(59,130,246,0.12) !important; border-color: rgba(59,130,246,0.35); }
+body:not(.dark-mode) .bg-secondary { color: #475569 !important; background: rgba(100,116,139,0.14) !important; border-color: rgba(100,116,139,0.3); }
 
