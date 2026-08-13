@@ -55,6 +55,7 @@
 
 /* ---- Light mode override (dark-mode toggle uses body class) ---- */
 body:not(.dark-mode) {
+  --primary-light: #1D4ED8; /* darker than the dark-theme accent so accent text stays readable on light backgrounds */
   --glass-bg: rgba(255,255,255,0.85);
   --glass-border: rgba(59,130,246,0.12);
   --glass-hover: rgba(59,130,246,0.06);
