@@ -206,31 +206,8 @@ async function submitStockOut() {
     if (pRes.success) { soAllProducts = pRes.data; populateSoProductSelect(); }
     if (hRes.success) { soHistory = hRes.data; renderSoHistory(); }
 
-    const updated = pRes.success ? pRes.data.find(x => x.ProductID === productID) : null;
-    const newQty = updated ? parseInt(updated.Quantity) : (p ? parseInt(p.Quantity) - quantity : null);
-
-    notifyStockOut({
-      productName: p?.ProductName,
-      sku: p?.SKU,
-      quantity,
-      unit: p?.Unit,
-      receiver,
-      date,
-      note,
-      newQuantity: newQty,
-    });
-
-    // แจ้งเตือนแยกอีกครั้ง ถ้าสินค้าใกล้หมด/หมดสต๊อกหลังเบิกออก
-    const minStock = p ? parseInt(p.MinStock) || 0 : 0;
-    if (newQty != null && newQty <= minStock) {
-      notifyLowStock({
-        productName: p?.ProductName,
-        sku: p?.SKU,
-        quantity: newQty,
-        unit: p?.Unit,
-        minStock,
-      });
-    }
+    // Notifications for this stock-out (and the low-stock alert, if it
+    // now applies) are sent server-side by Code.gs.
   } else {
     showToast(result.message || 'เกิดข้อผิดพลาด', 'error');
   }
