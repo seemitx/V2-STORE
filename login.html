@@ -294,7 +294,6 @@
   </div>
 
   <script src="js/api.js"></script>
-  <script src="js/discord.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.10.5/sweetalert2.all.min.js"></script>
   <script>
     // ถ้า login อยู่แล้ว ไปหน้า dashboard
@@ -334,7 +333,9 @@
           (username === 'staff' && password === 'staff1234')) {
         const role = username === 'admin' ? 'admin' : 'staff';
         setSession({ username, role, id: username });
-        notifyLoginSuccess({ username, role });
+        // Login notifications are sent server-side by Code.gs's login()
+        // action; this demo shortcut skips the API call entirely, so
+        // no notification fires for it (by design — it's not a real login).
         window.location.href = 'index.html';
         return;
       }
@@ -343,14 +344,12 @@
       const result = await apiLogin(username, password);
       if (result.success) {
         setSession(result.user);
-        notifyLoginSuccess({ username: result.user.username, role: result.user.role });
         window.location.href = 'index.html';
       } else {
         errEl.textContent = '❌ ' + (result.message || 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง');
         errEl.style.display = 'block';
         btn.disabled = false;
         txt.textContent = 'เข้าสู่ระบบ';
-        notifyLoginFailed({ username });
       }
     }
 
