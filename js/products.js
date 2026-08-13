@@ -307,23 +307,13 @@ async function saveProduct() {
   }
 
   if (result.success) {
+    // Discord notifications are sent by the Google Apps Script backend
+    // itself (see Code.gs) for every add/update, so no client-side call
+    // is needed here — the old client-side version also exposed the
+    // webhook URLs to anyone viewing this page's source.
     showToast(result.message || 'บันทึกสำเร็จ', 'success');
     productModal.hide();
     loadProducts();
-
-    if (editMode) {
-      notifyProductUpdate({ productName: data.productName, sku: data.sku });
-    } else {
-      notifyProductAdd({
-        productName: data.productName,
-        sku: data.sku,
-        category: data.category,
-        unit: data.unit,
-        quantity: data.quantity,
-        costPrice: data.costPrice,
-        sellPrice: data.sellPrice,
-      });
-    }
   } else {
     showToast(result.message || 'เกิดข้อผิดพลาด', 'error');
   }
@@ -336,7 +326,7 @@ async function deleteProduct(id, name) {
   if (result.success) {
     showToast(result.message, 'success');
     loadProducts();
-    notifyProductDelete({ productName: name, id });
+    // Notification for the delete is sent server-side by Code.gs.
   } else {
     showToast(result.message, 'error');
   }
